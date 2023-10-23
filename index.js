@@ -16,7 +16,6 @@ register.registerMetric(gaugeSize)
 register.registerMetric(gaugeTime)
 app.get('/', (req, res) => {
     let allPathPromise = paths.map(path => {
-        let timer = gaugeTime.startTimer({ path: path });
         var allPathPromise;
         if (path.endsWith("*")) {
             var parentPath = path.slice(0, path.length - 2);
@@ -31,6 +30,8 @@ app.get('/', (req, res) => {
         
         return allPathPromise.then(allPath => {
             return allPath.map(subPath => {
+                let timer = gaugeTime.startTimer({ path: subPath });
+
                 return new Promise((res, reject) => {
                     fastFolderSize(subPath, (err, bytes) => {
                         if (err) {
